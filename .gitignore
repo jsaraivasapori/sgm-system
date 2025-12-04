@@ -1,0 +1,9 @@
+# Dependências
+**/node_modules
+**/dist
+**/build
+**/.env
+
+# Logs e sistema
+.DS_Store
+*.log
