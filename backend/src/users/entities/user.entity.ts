@@ -1,4 +1,5 @@
 // src/users/entities/user.entity.ts
+import { Exclude } from 'class-transformer';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -19,6 +20,7 @@ export class User {
   @Column({ unique: true }) // Email não pode repetir
   email: string;
 
+  @Exclude() //quando o NestJS transformar essa classe em JSON para enviar ao frontend, ele vai pular a senha.
   @Column()
   password: string;
 
