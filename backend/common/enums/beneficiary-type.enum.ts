@@ -1,0 +1,5 @@
+export enum BeneficiaryType {
+  PREFEITURA = 'PREFEITURA',
+  ASSOCIACAO = 'ASSOCIACAO',
+  SINDICATO = 'SINDICATO',
+}
