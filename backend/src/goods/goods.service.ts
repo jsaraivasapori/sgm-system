@@ -1,26 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateGoodDto } from './dto/create-good.dto';
 import { UpdateGoodDto } from './dto/update-good.dto';
+import { IGoodsRepository } from './repository/goods.repository.interface';
 
 @Injectable()
 export class GoodsService {
-  create(createGoodDto: CreateGoodDto) {
-    return 'This action adds a new good';
+  constructor(
+    // Injetamos usando um TOKEN (string) que definiremos no módulo para atrelar a classe GoodRepository
+    @Inject('IGoodsRepository')
+    private readonly goodsRepository: IGoodsRepository,
+  ) {}
+
+  async create(createGoodDto: CreateGoodDto) {
+    return this.goodsRepository.create(createGoodDto);
   }
 
-  findAll() {
-    return `This action returns all goods`;
+  async findAll() {
+    return this.goodsRepository.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} good`;
+  async findOne(id: string) {
+    const good = await this.goodsRepository.findById(id);
+    if (!good) {
+      throw new NotFoundException(`Bem não encontrado.`);
+    }
+    return good;
   }
 
-  update(id: number, updateGoodDto: UpdateGoodDto) {
-    return `This action updates a #${id} good`;
+  async update(id: string, updateGoodDto: UpdateGoodDto) {
+    // O repository verifica se é ativo antes de atualizar
+    const updatedGood = await this.goodsRepository.update(id, updateGoodDto);
+    if (!updatedGood) {
+      throw new NotFoundException(`Bem (Good) não encontrado ou inativo.`);
+    }
+    return updatedGood;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} good`;
+  async remove(id: string) {
+    // Verificamos se existe (e se está ativo) antes de "deletar"
+    // Isso garante que retornamos 404 se o usuário tentar deletar algo que já foi soft-deleted
+    await this.findOne(id);
+
+    return this.goodsRepository.remove(id);
   }
 }
