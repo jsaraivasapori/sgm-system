@@ -1,26 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSupporterDto } from './dto/create-supporter.dto';
 import { UpdateSupporterDto } from './dto/update-supporter.dto';
 
+import { SupporterRole } from 'common/enums/supporter-type.enum';
+import { ISupportersRepository } from './repository/supporter.repository.interface';
+
 @Injectable()
 export class SupportersService {
-  create(createSupporterDto: CreateSupporterDto) {
-    return 'This action adds a new supporter';
+  constructor(
+    // Injetamos usando um TOKEN (string) que definiremos no módulo para atrelar a classe GoodRepository
+    @Inject('ISupportersRepository')
+    private readonly repository: ISupportersRepository,
+  ) {}
+
+  create(createDto: CreateSupporterDto) {
+    return this.repository.create(createDto);
   }
 
-  findAll() {
-    return `This action returns all supporters`;
+  findAll(role?: SupporterRole) {
+    return this.repository.findAll(role);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} supporter`;
+  async findOne(id: string) {
+    const supporter = await this.repository.findOne(id);
+    if (!supporter) {
+      throw new NotFoundException(`Apoiador não encontrado.`);
+    }
+    return supporter;
   }
 
-  update(id: number, updateSupporterDto: UpdateSupporterDto) {
-    return `This action updates a #${id} supporter`;
+  async update(id: string, updateDto: UpdateSupporterDto) {
+    const supporter = await this.findOne(id);
+    return this.repository.update(supporter, updateDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} supporter`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.repository.softDelete(id);
   }
 }
