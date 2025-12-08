@@ -1,3 +1,4 @@
+import { ProcessCodevasf } from 'src/processes-codevasf/entities/process-codevasf.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
 @Entity('supporters')
@@ -14,6 +15,6 @@ export class Supporter {
   @Column()
   city: string; // Base eleitoral principal
 
-  @OneToMany(() => Process, (process) => process.supporter)
-  processes: Process[];
+  @OneToMany(() => ProcessCodevasf, (process) => process.supporter)
+  processes: ProcessCodevasf[];
 }

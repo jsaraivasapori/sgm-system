@@ -1,6 +1,6 @@
 import { ProcessCodevasfStatus } from 'common/enums/process-codevasf-status.enum';
 import { Beneficiary } from 'src/beneficiaries/entities/beneficiary.entity';
-import { Good } from 'src/goods/entities/good.entity';
+import { Good } from '../../goods/entities/good.entity';
 import { Supporter } from 'src/supporters/entities/supporter.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
