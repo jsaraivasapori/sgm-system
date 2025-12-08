@@ -13,9 +13,16 @@ import {
 import { GoodsService } from './goods.service';
 import { CreateGoodDto } from './dto/create-good.dto';
 import { UpdateGoodDto } from './dto/update-good.dto';
-import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Good } from './entities/good.entity';
-
+@ApiTags('Goods')
+@ApiBearerAuth('access-token')
 @Controller('goods')
 export class GoodsController {
   constructor(private readonly goodsService: GoodsService) {}
