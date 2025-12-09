@@ -20,6 +20,9 @@ export class ProcessCodevasf {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ length: 150, nullable: true }) // Pode ser nulo, pois vamos preencher se faltar
+  title: string;
+
   @Column({ unique: true })
   nup: string;
 
@@ -68,6 +71,7 @@ export class ProcessCodevasf {
   @JoinColumn({ name: 'updated_by_id' })
   updatedBy: User;
 
+  //  HISTÓRICO DOS PROCESSOS
   @OneToMany(() => ProcessCodevasfHistory, (history) => history.process)
   history: ProcessCodevasfHistory[];
 }
