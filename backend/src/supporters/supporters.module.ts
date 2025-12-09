@@ -15,5 +15,6 @@ import { SupportersRepository } from './repository/supporter.repository';
       useClass: SupportersRepository,
     },
   ],
+  exports: [SupportersService],
 })
 export class SupportersModule {}

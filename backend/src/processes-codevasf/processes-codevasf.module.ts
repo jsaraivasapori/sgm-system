@@ -5,10 +5,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProcessCodevasf } from './entities/process-codevasf.entity';
 import { ProcessCodevasfHistory } from './entities/process-codevasf-history.entity';
 import { ProcessesCodevasReposiory } from './repository/processes-codevasf.repository';
+import { GoodsModule } from 'src/goods/goods.module';
+import { SupportersModule } from 'src/supporters/supporters.module';
+import { BeneficiariesModule } from 'src/beneficiaries/beneficiaries.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([ProcessCodevasf, ProcessCodevasfHistory]),
+    GoodsModule,
+    SupportersModule,
+    BeneficiariesModule,
   ],
   controllers: [ProcessesCodevasfController],
   providers: [
