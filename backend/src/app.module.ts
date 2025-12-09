@@ -7,6 +7,8 @@ import { GoodsModule } from './goods/goods.module';
 import { BeneficiariesModule } from './beneficiaries/beneficiaries.module';
 import { SupportersModule } from './supporters/supporters.module';
 import { ProcessesCodevasfModule } from './processes-codevasf/processes-codevasf.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -27,6 +29,11 @@ import { ProcessesCodevasfModule } from './processes-codevasf/processes-codevasf
     ProcessesCodevasfModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

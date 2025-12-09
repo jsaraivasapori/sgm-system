@@ -10,12 +10,13 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthResponseDto } from './dto/auth-response.dto';
+import { IsPublic } from 'common/decorators/is-public.decorator';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
+  @IsPublic()
   @HttpCode(HttpStatus.OK) // Login deve retornar 200, não 201 (Created)
   @Post('login')
   @ApiOperation({ summary: 'Realizar login (Obter Token JWT)' })
