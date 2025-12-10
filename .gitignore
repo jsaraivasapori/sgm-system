@@ -3,6 +3,7 @@
 **/dist
 **/build
 **/.env
+**/.next
 
 # Logs e sistema
 .DS_Store
