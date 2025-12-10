@@ -10,14 +10,32 @@ import { IUsersRepository } from './repositories/users.repository.interface';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
   constructor(
     @Inject('IUsersRepository')
     private readonly usersRepository: IUsersRepository,
+    private configService: ConfigService,
   ) {}
 
+  // --- SEED ---
+  async onModuleInit() {
+    const adminEmail = this.configService.get<string>('DEFAULT_ADMIN_EMAIL');
+    const adminPass = this.configService.get<string>('DEFAULT_ADMIN_PASSWORD');
+
+    if (adminEmail && adminPass) {
+      const exists = await this.usersRepository.findByEmail(adminEmail);
+      if (!exists) {
+        await this.create({
+          name: 'Root',
+          email: adminEmail,
+          password: adminPass,
+        });
+      }
+    }
+  }
   async create(createUserDto: CreateUserDto) {
     // 1 - Verifica se já existe o  email no DB
 
