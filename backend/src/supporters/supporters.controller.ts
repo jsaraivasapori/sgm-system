@@ -20,7 +20,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Supporter } from './entities/supporter.entity';
-import { SupporterRole } from 'common/enums/supporter-type.enum';
+import { SupporterProfile } from 'common/enums/supporter-type.enum';
 import { GetSupportersFilterDto } from './dto/create-supporter-filter.dto';
 
 @ApiTags('Supporters')
@@ -42,7 +42,7 @@ export class SupportersController {
   })
   @ApiQuery({
     name: 'role',
-    enum: SupporterRole,
+    enum: SupporterProfile,
     required: false,
     description: 'Filtrar por cargo político',
   })
