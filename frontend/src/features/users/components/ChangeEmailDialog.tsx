@@ -1,115 +1,114 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { Loader2, Mail } from "lucide-react";
-
+import { useEffect, useState } from "react";
+import { Mail, Loader2 } from "lucide-react"; // Adicionei ícones para UI melhor
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { changeEmailSchema, type ChangeEmailForm, type User } from "../schemas";
-import { changeUserEmail } from "@/services/User/userService";
+import type { User } from "../schemas";
 
-interface Props {
-  user: User;
+interface ChangeEmailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  user: User;
 }
 
-export function ChangeEmailDialog({ user, open, onOpenChange }: Props) {
-  const queryClient = useQueryClient();
+export function ChangeEmailDialog({
+  open,
+  onOpenChange,
+  user,
+}: ChangeEmailDialogProps) {
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<ChangeEmailForm>({
-    resolver: zodResolver(changeEmailSchema),
-    defaultValues: {
-      newEmail: "", // Começa vazio para forçar o usuário a digitar o novo
-    },
-  });
-
-  // Reseta o formulário sempre que o modal fecha ou o usuário muda
+  // Reseta o estado quando o modal abre ou o usuário muda
   useEffect(() => {
-    if (!open) {
-      reset();
+    if (user) {
+      setEmail(user.email);
     }
-  }, [open, reset]);
+  }, [user, open]);
 
-  const mutation = useMutation({
-    mutationFn: (data: ChangeEmailForm) => changeUserEmail(user.id, data),
-    onSuccess: () => {
-      toast.success("E-mail atualizado com sucesso!");
-      // Importante: Invalidar a query 'users' para que a tabela atualize o e-mail novo
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      // TODO: Conecte sua API aqui
+      console.log("Salvando novo email:", email);
+
+      // await updateUserEmail(user.id, email);
+
       onOpenChange(false);
-    },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || "Erro ao atualizar e-mail.";
-      toast.error(Array.isArray(msg) ? msg[0] : msg);
-    },
-  });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-106.25">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Alterar E-mail</DialogTitle>
-          <DialogDescription>
-            Atual e-mail:{" "}
-            <span className="font-medium text-foreground">{user.email}</span>
-          </DialogDescription>
+          <div className="flex items-center gap-3 mb-2">
+            {/* Ícone estilizado (Tema Azul para Email) */}
+            <div className="p-2 bg-blue-100 text-blue-600 rounded-lg w-fit">
+              <Mail size={20} />
+            </div>
+            <div className="space-y-1">
+              <DialogTitle>Alterar E-mail</DialogTitle>
+              <DialogDescription>
+                Atualize o endereço de contato para{" "}
+                <strong>{user?.name}</strong>.
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
-        <form
-          onSubmit={handleSubmit((data) => mutation.mutate(data))}
-          className="space-y-4"
-        >
+        <form onSubmit={handleSubmit} className="space-y-6 py-2">
+          {/* Input com layout vertical limpo */}
           <div className="space-y-2">
-            <Label htmlFor="newEmail">Novo E-mail</Label>
+            <Label htmlFor="email" className="text-gray-700 font-medium">
+              Novo E-mail
+            </Label>
             <div className="relative">
               <Input
-                id="newEmail"
-                {...register("newEmail")}
-                placeholder="novo.email@exemplo.com"
+                id="email"
                 type="email"
-                className="pl-9" // Espaço para o ícone
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="focus-visible:ring-blue-500 pl-3"
+                placeholder="exemplo@dominio.com"
+                required
               />
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             </div>
-            {errors.newEmail && (
-              <span className="text-sm text-red-500">
-                {errors.newEmail.message}
-              </span>
-            )}
           </div>
 
-          <div className="flex justify-end gap-3 pt-2">
+          <DialogFooter className="pt-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={mutation.isPending}
+              disabled={isLoading}
+              className="hover:bg-gray-50"
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Salvar E-mail
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="bg-gray-900 hover:bg-gray-800 text-white transition-colors"
+            >
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading ? "Salvando..." : "Salvar Alterações"}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

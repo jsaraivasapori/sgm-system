@@ -1,13 +1,13 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   Loader2,
-  Mail,
-  Lock,
   User as UserIcon,
   Shield,
+  Save,
   CheckCircle2,
 } from "lucide-react";
 
@@ -37,68 +37,71 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-// Importe seu serviço e schema
-import { createUser } from "@/services/User/userService";
-import { createUserSchema, type CreateUserForm } from "../schemas";
+// Imports atualizados
+import { updateUser } from "@/services/User/userService";
+import { updateUserSchema, type UpdateUserForm, type User } from "../schemas";
 
-interface CreateUserDialogProps {
+interface EditUserDialogProps {
+  user: User; // Recebe o usuário atual para preencher o form
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function CreateUserDialog({
+export function EditUserDialog({
+  user,
   open,
   onOpenChange,
-}: CreateUserDialogProps) {
+}: EditUserDialogProps) {
   const queryClient = useQueryClient();
 
-  // Configuração do Formulário
-  const form = useForm<CreateUserForm>({
-    resolver: zodResolver(createUserSchema),
+  const form = useForm<UpdateUserForm>({
+    resolver: zodResolver(updateUserSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      role: "USER", // Valor padrão (precisa bater com seu Enum/Schema)
+      name: user.name,
+      role: user.role,
     },
   });
 
-  // Mutação para criar usuário
+  // Efeito vital: Atualiza o formulário se o usuário selecionado mudar
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        name: user.name,
+        role: user.role,
+      });
+    }
+  }, [user, open, form]);
+
   const mutation = useMutation({
-    mutationFn: createUser,
+    mutationFn: (data: UpdateUserForm) => updateUser(user.id, data),
     onSuccess: () => {
-      toast.success("Usuário criado com sucesso!", {
-        description: "As credenciais de acesso foram geradas.",
+      toast.success("Usuário atualizado!", {
         icon: <CheckCircle2 className="h-5 w-5 text-green-600" />,
       });
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      form.reset();
       onOpenChange(false);
     },
-    onError: (error) => {
-      console.error(error);
-      toast.error("Erro ao criar usuário", {
-        description: "Verifique se o e-mail já está em uso.",
-      });
+    onError: () => {
+      toast.error("Erro ao atualizar usuário.");
     },
   });
 
-  const onSubmit = (data: CreateUserForm) => {
+  const onSubmit = (data: UpdateUserForm) => {
     mutation.mutate(data);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-125 p-0 overflow-hidden border-0 shadow-xl">
-        {/* Cabeçalho Colorido */}
+        {/* Cabeçalho Azul (Padrão Visual) */}
         <div className="bg-blue-600 p-6 text-white">
           <DialogHeader className="text-white">
             <DialogTitle className="text-2xl flex items-center gap-2">
               <UserIcon className="h-6 w-6 text-blue-200" />
-              Novo Usuário
+              Editar Usuário
             </DialogTitle>
             <DialogDescription className="text-blue-100">
-              Preencha os dados abaixo para conceder acesso ao sistema.
+              Altere as informações cadastrais de {user.name}.
             </DialogDescription>
           </DialogHeader>
         </div>
@@ -106,7 +109,7 @@ export function CreateUserDialog({
         <div className="p-6 pt-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {/* Nome */}
+              {/* Campo Nome */}
               <FormField
                 control={form.control}
                 name="name"
@@ -119,7 +122,7 @@ export function CreateUserDialog({
                       <div className="relative">
                         <UserIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                         <Input
-                          placeholder="Ex: João Silva"
+                          placeholder="Nome do usuário"
                           className="pl-9 bg-gray-50 border-gray-200 focus:bg-white transition-all"
                           {...field}
                         />
@@ -130,57 +133,7 @@ export function CreateUserDialog({
                 )}
               />
 
-              {/* Grid para E-mail e Senha */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-700 font-semibold">
-                        E-mail
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                          <Input
-                            placeholder="usuario@email.com"
-                            className="pl-9 bg-gray-50 border-gray-200 focus:bg-white transition-all"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-700 font-semibold">
-                        Senha Inicial
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                          <Input
-                            type="password"
-                            placeholder="******"
-                            className="pl-9 bg-gray-50 border-gray-200 focus:bg-white transition-all"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Select de Role (Cargo) */}
+              {/* Campo Role */}
               <FormField
                 control={form.control}
                 name="role"
@@ -246,10 +199,13 @@ export function CreateUserDialog({
                   {mutation.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Criando...
+                      Salvando...
                     </>
                   ) : (
-                    "Criar Usuário"
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      Salvar Alterações
+                    </>
                   )}
                 </Button>
               </DialogFooter>

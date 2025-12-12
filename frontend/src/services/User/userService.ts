@@ -1,14 +1,27 @@
 import type {
   User,
   CreateUserForm,
-  UpdateNameForm,
+  UpdateUserForm,
   ChangeEmailForm,
   ChangePasswordForm,
+  UserPaginatedResponse,
+  GetUsersParams,
 } from "@/features/users/schemas";
 import { api } from "@/services/api";
 
-export async function getUsers(): Promise<User[]> {
-  const { data } = await api.get<User[]>("/users");
+export async function getUsers(
+  params: GetUsersParams
+): Promise<UserPaginatedResponse> {
+  // O axios transforma o objeto params em query string: ?page=1&limit=10&search=...
+  const { data } = await api.get<UserPaginatedResponse>("/users", {
+    params: {
+      page: params.page || 1,
+      limit: params.limit || 10,
+      search: params.search || "",
+      status: params.status,
+      role: params.role,
+    },
+  });
   return data;
 }
 
@@ -18,9 +31,9 @@ export async function createUser(data: CreateUserForm): Promise<User> {
 }
 
 // Atualiza apenas dados básicos (Nome)
-export async function updateUserName(
+export async function updateUser(
   id: string,
-  data: UpdateNameForm
+  data: UpdateUserForm
 ): Promise<User> {
   const response = await api.patch<User>(`/users/${id}`, data);
   return response.data;
