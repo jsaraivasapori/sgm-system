@@ -6,6 +6,7 @@ import { CreateSupporterDto } from '../dto/create-supporter.dto';
 import { SupporterRole } from 'common/enums/supporter-type.enum';
 import { UpdateSupporterDto } from '../dto/update-supporter.dto';
 import { ISupportersRepository } from './supporter.repository.interface';
+import { GetSupportersFilterDto } from '../dto/create-supporter-filter.dto';
 
 @Injectable()
 export class SupportersRepository implements ISupportersRepository {
@@ -19,15 +20,29 @@ export class SupportersRepository implements ISupportersRepository {
     return this.typeOrmRepo.save(supporter);
   }
 
-  async findAll(role?: SupporterRole): Promise<Supporter[]> {
-    return this.typeOrmRepo.find({
-      where: {
-        ...(role ? { role } : {}), // Lógica de filtro fica aqui
-      },
-      order: {
-        name: 'ASC',
-      },
-    });
+  async findAll(filters: GetSupportersFilterDto): Promise<Supporter[]> {
+    const { role, startDate, endDate } = filters;
+    const query = this.typeOrmRepo.createQueryBuilder('supporter');
+
+    if (role) {
+      query.andWhere('supporter.role = :role', { role });
+    }
+
+    if (startDate) {
+      query.andWhere('supporter.createdAt >= :startDate', { startDate });
+    }
+
+    if (endDate) {
+      // Ajuste para pegar o final do dia
+      query.andWhere('supporter.createdAt <= :endDate', {
+        endDate: `${endDate} 23:59:59`,
+      });
+    }
+
+    // Ordenação opcional (muito útil em listagens)
+    query.orderBy('supporter.createdAt', 'DESC');
+
+    return query.getMany();
   }
 
   async findOne(id: string): Promise<Supporter | null> {

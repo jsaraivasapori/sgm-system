@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { SupportersService } from './supporters.service';
 import { CreateSupporterDto } from './dto/create-supporter.dto';
@@ -20,6 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { Supporter } from './entities/supporter.entity';
 import { SupporterRole } from 'common/enums/supporter-type.enum';
+import { GetSupportersFilterDto } from './dto/create-supporter-filter.dto';
 
 @ApiTags('Supporters')
 @ApiBearerAuth('access-token')
@@ -50,8 +52,8 @@ export class SupportersController {
     description: 'Lista retornada com sucesso.',
     type: [Supporter],
   })
-  findAll() {
-    return this.supportersService.findAll();
+  findAll(@Query() filterDto: GetSupportersFilterDto) {
+    return this.supportersService.findAll(filterDto);
   }
 
   @Get(':id')

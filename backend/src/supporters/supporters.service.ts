@@ -4,11 +4,11 @@ import { UpdateSupporterDto } from './dto/update-supporter.dto';
 
 import { SupporterRole } from 'common/enums/supporter-type.enum';
 import { ISupportersRepository } from './repository/supporter.repository.interface';
+import { GetSupportersFilterDto } from './dto/create-supporter-filter.dto';
 
 @Injectable()
 export class SupportersService {
   constructor(
-    // Injetamos usando um TOKEN (string) que definiremos no módulo para atrelar a classe GoodRepository
     @Inject('ISupportersRepository')
     private readonly repository: ISupportersRepository,
   ) {}
@@ -17,8 +17,8 @@ export class SupportersService {
     return this.repository.create(createDto);
   }
 
-  findAll(role?: SupporterRole) {
-    return this.repository.findAll(role);
+  findAll(filterDto: GetSupportersFilterDto) {
+    return this.repository.findAll(filterDto);
   }
 
   async findOne(id: string) {
