@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SupporterRole } from 'common/enums/supporter-type.enum';
+import { SupporterProfile } from 'common/enums/supporter-type.enum';
 import { ProcessCodevasf } from 'src/processes-codevasf/entities/process-codevasf.entity';
 import {
   Entity,
@@ -22,16 +22,16 @@ export class Supporter {
   name: string; // Ex: Deputado Fulano
 
   @ApiProperty({
-    enum: SupporterRole,
-    example: SupporterRole.VEREADOR,
+    enum: SupporterProfile,
+    example: SupporterProfile.VEREADOR,
     description: 'O papel político ou social do apoiador',
   })
   @Column({
     type: 'enum',
-    enum: SupporterRole,
-    default: SupporterRole.LIDER_COMUNITARIO, // Opcional: Define um padrão
+    enum: SupporterProfile,
+    default: SupporterProfile.LIDER_COMUNITARIO, // Opcional: Define um padrão
   })
-  role: SupporterRole;
+  profile: SupporterProfile;
 
   @Column()
   @ApiProperty({ example: '38999499978', nullable: true })

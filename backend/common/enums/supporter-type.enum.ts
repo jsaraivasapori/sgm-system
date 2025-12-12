@@ -1,4 +1,4 @@
-export enum SupporterRole {
+export enum SupporterProfile {
   VEREADOR = 'VEREADOR',
   PREFEITO = 'PREFEITO',
   LIDER_COMUNITARIO = 'LÍDER COMUNITÁRIO',

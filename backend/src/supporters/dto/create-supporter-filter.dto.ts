@@ -1,10 +1,10 @@
 import { IsDateString, IsEnum, IsOptional } from 'class-validator';
-import { SupporterRole } from 'common/enums/supporter-type.enum';
+import { SupporterProfile } from 'common/enums/supporter-type.enum';
 
 export class GetSupportersFilterDto {
   @IsOptional()
-  @IsEnum(SupporterRole)
-  role?: SupporterRole;
+  @IsEnum(SupporterProfile)
+  profile?: SupporterProfile;
 
   @IsOptional()
   @IsDateString()

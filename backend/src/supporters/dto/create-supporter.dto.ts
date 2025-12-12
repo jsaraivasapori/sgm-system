@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { SupporterRole } from 'common/enums/supporter-type.enum';
+import { SupporterProfile } from 'common/enums/supporter-type.enum';
 
 export class CreateSupporterDto {
   @ApiProperty({ example: 'João Silva' })
@@ -9,16 +9,16 @@ export class CreateSupporterDto {
   name: string;
 
   @ApiProperty({
-    enum: SupporterRole,
+    enum: SupporterProfile,
 
-    example: SupporterRole.VEREADOR,
+    example: SupporterProfile.VEREADOR,
     description: 'Cargo político ou social',
   })
-  @IsEnum(SupporterRole, {
+  @IsEnum(SupporterProfile, {
     message: 'O cargo deve ser válido (VEREADOR, PREFEITO, etc.)',
   })
   @IsNotEmpty()
-  role: SupporterRole;
+  profile: SupporterProfile;
 
   @ApiProperty({ example: 'Montes Claros' })
   @IsString()

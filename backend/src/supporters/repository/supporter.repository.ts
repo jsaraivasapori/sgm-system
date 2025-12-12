@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Supporter } from '../entities/supporter.entity';
 import { CreateSupporterDto } from '../dto/create-supporter.dto';
-import { SupporterRole } from 'common/enums/supporter-type.enum';
 import { UpdateSupporterDto } from '../dto/update-supporter.dto';
 import { ISupportersRepository } from './supporter.repository.interface';
 import { GetSupportersFilterDto } from '../dto/create-supporter-filter.dto';
@@ -21,11 +20,11 @@ export class SupportersRepository implements ISupportersRepository {
   }
 
   async findAll(filters: GetSupportersFilterDto): Promise<Supporter[]> {
-    const { role, startDate, endDate } = filters;
+    const { profile, startDate, endDate } = filters;
     const query = this.typeOrmRepo.createQueryBuilder('supporter');
 
-    if (role) {
-      query.andWhere('supporter.role = :role', { role });
+    if (profile) {
+      query.andWhere('supporter.profile = :profile', { profile });
     }
 
     if (startDate) {
