@@ -2,7 +2,6 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSupporterDto } from './dto/create-supporter.dto';
 import { UpdateSupporterDto } from './dto/update-supporter.dto';
 
-import { SupporterRole } from 'common/enums/supporter-type.enum';
 import { ISupportersRepository } from './repository/supporter.repository.interface';
 import { GetSupportersFilterDto } from './dto/create-supporter-filter.dto';
 
